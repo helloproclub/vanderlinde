@@ -1,7 +1,7 @@
-// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.134.0/containers/rust
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.140.1/containers/rust
 {
-	"name": "vanderlinde",
+	"name": "Rust",
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
@@ -23,14 +23,14 @@
 		"bungcip.better-toml",
 		"vadimcn.vscode-lldb",
 		"mutantdino.resourcemonitor"
-	],
+	]
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [8000],
+	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "rustc --version",
 
-	// Comment out to run as root instead.
-	"remoteUser": "vscode"
+	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "vscode"
 }
