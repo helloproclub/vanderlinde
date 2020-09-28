@@ -6,3 +6,15 @@ table! {
         password_hash -> Text,
     }
 }
+
+table! {
+    users_status (id) {
+        id -> Uuid,
+        status -> Varchar,
+    }
+}
+
+allow_tables_to_appear_in_same_query!(
+    users,
+    users_status,
+);
