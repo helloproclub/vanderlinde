@@ -11,7 +11,6 @@ pub struct RegisterRequest {
     username: String,
     email: String,
     password: String,
-    secret: String,
 }
 
 #[derive(Deserialize)]
@@ -30,9 +29,6 @@ pub struct AuthResponse {
 
 #[post("/register", data = "<form>")]
 pub fn register(db: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
-    if form.secret != crate::config::secret() {
-        return Err(APIResponse::error().unauthorized().message("wrong secret"));
-    };
     let result = User::new(db, &form.email, &form.username, &form.password);
     let new_user = result?;
     let id = format!("{}", new_user.id.to_hyphenated());
