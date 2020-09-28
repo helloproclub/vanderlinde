@@ -14,7 +14,6 @@ extern crate serde_json;
 mod config;
 mod database;
 mod domain;
-// mod graphql;
 mod handler;
 mod lib;
 mod server;

@@ -1,8 +1,6 @@
 use crate::config;
 use crate::database::DbConn;
-// use crate::graphql::{Mutations, Query, Schema};
 use crate::handler::auth::*;
-// use crate::handler::graphql::*;
 use crate::handler::ping::*;
 
 use rocket::config::{Config, Environment, Value};
@@ -66,9 +64,7 @@ impl Server {
         rocket::custom(self.config)
             .attach(DbConn::fairing())
             .attach(make_cors())
-            // .manage(Schema::new(Query, Mutations))
             .mount("/ping", routes![ping])
             .mount("/auth", routes![register, login])
-            // .mount("/graphql", rocket::routes![post_graphql_handler, graphiql])
     }
 }
