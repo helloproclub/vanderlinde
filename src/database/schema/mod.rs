@@ -10,7 +10,7 @@ table! {
 table! {
     users_status (id) {
         id -> Uuid,
-        status -> Varchar,
+        status -> Text,
     }
 }
 

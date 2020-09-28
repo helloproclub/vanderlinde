@@ -3,6 +3,7 @@ extern crate bcrypt;
 use super::response::APIResponse;
 use crate::database::DbConn;
 use crate::domain::user::*;
+use crate::domain::status::*;
 use rocket_contrib::json;
 use rocket_contrib::json::Json;
 
@@ -19,6 +20,12 @@ pub struct LoginRequest {
     password: String,
 }
 
+// #[derive(Deserialize)]
+// pub struct UpdateRequest {
+//     email: String,
+//     password: String,
+// }
+
 #[derive(Serialize)]
 pub struct AuthResponse {
     id: String,
@@ -28,11 +35,14 @@ pub struct AuthResponse {
 }
 
 #[post("/register", data = "<form>")]
-pub fn register(db: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
-    let result = User::new(db, &form.email, &form.username, &form.password);
+pub fn register(db_user: DbConn, db_status: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
+    let result = User::new(db_user, &form.email, &form.username, &form.password);
     let new_user = result?;
     let id = format!("{}", new_user.id.to_hyphenated());
     let token = new_user.generate_token();
+    
+    Status::new(db_status, new_user.id, "Waiting for review")?;
+ 
     Ok(APIResponse::ok().data(json!(&AuthResponse {
         id,
         username: new_user.username,
@@ -63,3 +73,8 @@ pub fn login(db: DbConn, form: Json<LoginRequest>) -> Result<APIResponse, APIRes
         }
     }
 }
+
+// #[post("/update", data = "<form>")]
+// pub fn update(db: DbConn, form: Json<UpdateRequest>) -> Result<APIResponse, APIResponse> {
+    
+// }

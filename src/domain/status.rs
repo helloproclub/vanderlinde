@@ -30,11 +30,12 @@ pub struct UpdateStatusForm<'a> {
 impl Status {
     pub fn new<'a>(
         db: DbConn,
+        id: uuid::Uuid,
         status: &'a str,
     ) -> Result<Status, DBError> {
         diesel::insert_into(users_status::table)
             .values(&CreateStatusForm {
-                id: uuid::Uuid::new_v4(),
+                id,
                 status,
             })
             .get_result::<Status>(&*db)
@@ -47,9 +48,8 @@ impl Status {
 
     pub fn update_by_id(db: &DbConn, _id: Uuid, update: UpdateStatusForm) -> Result<Status, DBError> {
         use crate::database::schema::users_status::dsl::*;
-        let now = chrono::Local::now().naive_local();
         diesel::update(users_status.find(_id))
-            .set((&update))
+            .set(&update)
             .get_result::<Status>(&**db)
     }
 }
