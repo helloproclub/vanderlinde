@@ -16,6 +16,8 @@ table! {
     users_status (id) {
         id -> Uuid,
         status -> Text,
+        message -> Text,
+        discord_invite -> Text,
     }
 }
 
