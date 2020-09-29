@@ -46,10 +46,10 @@ impl Status {
         users_status.find(_id).first::<Status>(&**db).optional()
     }
 
-    pub fn update_by_id(db: &DbConn, _id: Uuid, update: UpdateStatusForm) -> Result<Status, DBError> {
+    pub fn update_by_id(db: &DbConn, _id: String, status_update: String) -> Result<Status, DBError> {
         use crate::database::schema::users_status::dsl::*;
-        diesel::update(users_status.find(_id))
-            .set(&update)
+        diesel::update(users_status.find(uuid::Uuid::parse_str(&_id).unwrap()))
+            .set(status.eq(status_update))
             .get_result::<Status>(&**db)
     }
 }
