@@ -17,13 +17,13 @@ pub struct APIResponse {
 impl APIResponse {
     /// Set the data of the `Response` to `data`.
     pub fn data(mut self, data: JsonValue) -> APIResponse {
-        self.data = data;
+        self.data = json!({ "ok": self.ok, "data": data });
         self
     }
 
     /// Convenience method to set `self.data` to `{"message": message}`.
     pub fn message(mut self, message: &str) -> APIResponse {
-        self.data = json!({ "message": message });
+        self.data = json!({"ok": self.ok, "message": message });
         self
     }
 
@@ -37,8 +37,8 @@ impl APIResponse {
 
     pub fn error() -> APIResponse {
         APIResponse {
-            ok: true,
-            data: json!({ "message": "Internal Server Error"}),
+            ok: false,
+            data: json!({ "message": "Internal Server Error", "ok": false }),
             status: Status::InternalServerError,
         }
     }
