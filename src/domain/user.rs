@@ -21,6 +21,7 @@ pub struct User {
     pub cv_url: String,
     pub letter_url: String,
     pub linkedin_url: String,
+    pub division: i32,
 }
 
 #[derive(Insertable)]
@@ -35,6 +36,7 @@ pub struct NewUser<'a> {
     pub cv_url: &'a str,
     pub letter_url: &'a str,
     pub linkedin_url: &'a str,
+    pub division: i32,
 }
 
 #[derive(AsChangeset)]
@@ -47,6 +49,7 @@ pub struct UpdateUser<'a> {
     pub cv_url: &'a str,
     pub letter_url: &'a str,
     pub linkedin_url: &'a str,
+    pub division: i32,
 }
 
 pub struct UserForm<'a> {
@@ -58,6 +61,7 @@ pub struct UserForm<'a> {
     pub cv_url: &'a str,
     pub letter_url: &'a str,
     pub linkedin_url: &'a str,
+    pub division: i32,
 }
 
 impl User {
@@ -73,6 +77,7 @@ impl User {
                 cv_url: user.cv_url,
                 letter_url: user.letter_url,
                 linkedin_url: user.linkedin_url,
+                division: user.division,
                 password_hash,
             })
             .get_result::<User>(&*db)

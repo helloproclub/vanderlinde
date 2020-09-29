@@ -25,6 +25,7 @@ pub struct UpdateRequest {
     pub cv_url: String,
     pub letter_url: String,
     pub linkedin_url: String,
+    pub division: i32,
 }
 
 #[get("/<userid>")]
@@ -96,6 +97,7 @@ pub fn update_me(
                     cv_url: &*form.cv_url,
                     letter_url: &*form.letter_url,
                     linkedin_url: &*form.linkedin_url,
+                    division: form.division,
                 },
             );
             match result {

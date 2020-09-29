@@ -9,6 +9,7 @@ table! {
         cv_url -> Text,
         letter_url -> Text,
         linkedin_url -> Text,
+        division -> Int4,
     }
 }
 
@@ -16,8 +17,8 @@ table! {
     users_status (id) {
         id -> Uuid,
         status -> Text,
-        message -> Text,
-        discord_invite -> Text,
+        message -> Nullable<Text>,
+        discord_invite -> Nullable<Text>,
     }
 }
 
