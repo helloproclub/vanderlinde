@@ -1,6 +1,7 @@
 use crate::config;
 use crate::database::DbConn;
 use crate::handler::auth::*;
+use crate::handler::status::*;
 use crate::handler::ping::*;
 
 use rocket::config::{Config, Environment, Value};
@@ -66,5 +67,6 @@ impl Server {
             .attach(make_cors())
             .mount("/ping", routes![ping])
             .mount("/auth", routes![register, login])
+            .mount("/status", routes![accepted, declined])
     }
 }

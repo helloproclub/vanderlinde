@@ -20,12 +20,6 @@ pub struct LoginRequest {
     password: String,
 }
 
-// #[derive(Deserialize)]
-// pub struct UpdateRequest {
-//     email: String,
-//     password: String,
-// }
-
 #[derive(Serialize)]
 pub struct AuthResponse {
     id: String,
@@ -73,8 +67,3 @@ pub fn login(db: DbConn, form: Json<LoginRequest>) -> Result<APIResponse, APIRes
         }
     }
 }
-
-// #[post("/update", data = "<form>")]
-// pub fn update(db: DbConn, form: Json<UpdateRequest>) -> Result<APIResponse, APIResponse> {
-    
-// }
