@@ -14,8 +14,13 @@ use uuid::Uuid;
 pub struct User {
     pub id: Uuid,
     pub email: String,
-    pub username: String,
+    pub nim: String,
+    pub name: String,
     pub password_hash: String,
+    pub ktm_url: String,
+    pub cv_url: String,
+    pub letter_url: String,
+    pub linkedin_url: String,
 }
 
 #[derive(Insertable)]
@@ -23,26 +28,61 @@ pub struct User {
 pub struct NewUser<'a> {
     pub id: uuid::Uuid,
     pub email: &'a str,
-    pub username: &'a str,
+    pub nim: &'a str,
+    pub name: &'a str,
     pub password_hash: &'a str,
+    pub ktm_url: &'a str,
+    pub cv_url: &'a str,
+    pub letter_url: &'a str,
+    pub linkedin_url: &'a str,
+}
+
+#[derive(AsChangeset)]
+#[table_name = "users"]
+pub struct UpdateUser<'a> {
+    pub email: &'a str,
+    pub nim: &'a str,
+    pub name: &'a str,
+    pub ktm_url: &'a str,
+    pub cv_url: &'a str,
+    pub letter_url: &'a str,
+    pub linkedin_url: &'a str,
+}
+
+pub struct UserForm<'a> {
+    pub email: &'a str,
+    pub name: &'a str,
+    pub nim: &'a str,
+    pub password: &'a str,
+    pub ktm_url: &'a str,
+    pub cv_url: &'a str,
+    pub letter_url: &'a str,
+    pub linkedin_url: &'a str,
 }
 
 impl User {
-    pub fn new<'a>(
-        db: DbConn,
-        email: &'a str,
-        username: &'a str,
-        password: &'a str,
-    ) -> Result<User, DBError> {
-        let password_hash = &hash(password, DEFAULT_COST).expect("failed to encrypt password");
+    pub fn new<'a>(db: DbConn, user: UserForm) -> Result<User, DBError> {
+        let password_hash = &hash(user.password, DEFAULT_COST).expect("failed to encrypt password");
         diesel::insert_into(users::table)
             .values(&NewUser {
                 id: uuid::Uuid::new_v4(),
-                username,
-                email,
+                name: user.name,
+                email: user.email,
+                nim: user.nim,
+                ktm_url: user.ktm_url,
+                cv_url: user.cv_url,
+                letter_url: user.letter_url,
+                linkedin_url: user.linkedin_url,
                 password_hash,
             })
             .get_result::<User>(&*db)
+    }
+
+    pub fn update_by_id(db: &DbConn, _id: Uuid, update: UpdateUser) -> Result<User, DBError> {
+        use crate::database::schema::users::dsl::*;
+        diesel::update(users.find(_id))
+            .set(&update)
+            .get_result::<User>(&**db)
     }
 
     pub fn get<'a>(db: DbConn, _email: &'a str) -> Result<Option<User>, DBError> {

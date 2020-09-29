@@ -1,13 +1,10 @@
 use crate::config;
 use crate::database::DbConn;
-// use crate::graphql::{Mutations, Query, Schema};
-use crate::handler::auth::*;
-// use crate::handler::graphql::*;
-use crate::handler::ping::*;
+use crate::handler::*;
 
 use rocket::config::{Config, Environment, Value};
-use rocket::fairing::AdHoc;
-use rocket::http::hyper::header;
+// use rocket::fairing::AdHoc;
+// use rocket::http::hyper::header;
 use std::collections::HashMap;
 
 pub struct Server {
@@ -21,9 +18,6 @@ use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors, CorsOptions};
 fn make_cors() -> Cors {
     let port: &str = &config::port();
     let allowed_origins = AllowedOrigins::some_exact(&[
-        // "https://talos-blinfoldking.herokuapp.com",
-        // "https://blinfoldking.dev",
-        // "https://www.blinfoldking.dev",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://0.0.0.0:3000",
@@ -66,9 +60,12 @@ impl Server {
         rocket::custom(self.config)
             .attach(DbConn::fairing())
             .attach(make_cors())
-            // .manage(Schema::new(Query, Mutations))
-            .mount("/ping", routes![ping])
-            .mount("/auth", routes![register, login])
-            // .mount("/graphql", rocket::routes![post_graphql_handler, graphiql])
+            .mount("/ping", routes![ping::ping])
+            .mount("/auth", routes![auth::register, auth::login])
+            .mount(
+                "/user",
+                routes![user::get_by_id, user::get_me, user::update_me],
+            )
+        // .mount("/graphql", rocket::routes![post_graphql_handler, graphiql])
     }
 }
