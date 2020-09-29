@@ -9,6 +9,7 @@ use rocket_contrib::json::Json;
 #[derive(Serialize)]
 pub struct StatusResponse {
     id: String,
+    user_id: String,
     status: String,
     message: String,
     discord_invite: String,
@@ -31,7 +32,7 @@ pub fn accepted(
         return Err(APIResponse::error().unauthorized().message("wrong secret"));
     };
 
-    let result = Status::update_by_id(
+    let result = Status::update_by_user_id(
         &db,
         id.to_string(),
         "Accepted".to_string(),
@@ -41,7 +42,13 @@ pub fn accepted(
 
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
-        Ok(datas) => Ok(APIResponse::ok()),
+        Ok(data) => Ok(APIResponse::ok().data(json!(&StatusResponse {
+            id: data.id.to_string(),
+            user_id: data.user_id.to_string(),
+            status: data.status,
+            message: data.message.unwrap(),
+            discord_invite: data.discord_invite.unwrap()
+        })))
     }
 }
 
@@ -55,7 +62,7 @@ pub fn declined(
         return Err(APIResponse::error().unauthorized().message("wrong secret"));
     };
 
-    let result = Status::update_by_id(
+    let result = Status::update_by_user_id(
         &db,
         id.to_string(),
         "Declined".to_string(),
@@ -65,6 +72,12 @@ pub fn declined(
 
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
-        Ok(datas) => Ok(APIResponse::ok()),
+        Ok(data) => Ok(APIResponse::ok().data(json!(&StatusResponse {
+            id: data.id.to_string(),
+            user_id: data.user_id.to_string(),
+            status: data.status,
+            message: data.message.unwrap(),
+            discord_invite: data.discord_invite.unwrap()
+        })))
     }
 }

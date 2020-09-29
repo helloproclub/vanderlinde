@@ -10,6 +10,7 @@ use uuid::Uuid;
 #[derive(Queryable)]
 pub struct Status {
     pub id: Uuid,
+    pub user_id: Uuid,
     pub status: String,
     pub message: Option<String>,
     pub discord_invite: Option<String>,
@@ -19,6 +20,7 @@ pub struct Status {
 #[table_name = "users_status"]
 pub struct CreateStatusForm<'a> {
     pub id: uuid::Uuid,
+    pub user_id: uuid::Uuid,
     pub status: &'a str,
     pub message: Option<&'a str>,
     pub discord_invite: Option<&'a str>,
@@ -33,10 +35,17 @@ pub struct UpdateStatusForm<'a> {
 }
 
 impl Status {
-    pub fn new<'a>(db: DbConn, id: uuid::Uuid, status: &'a str) -> Result<Status, DBError> {
+    pub fn new<'a>(
+        db: DbConn,
+        user_id: uuid::Uuid,
+        status: &'a str,
+    ) -> Result<Status, DBError> {
+        let _message = "";
+        let _discord_invite = "";
         diesel::insert_into(users_status::table)
             .values(&CreateStatusForm {
-                id,
+                id: uuid::Uuid::new_v4(),
+                user_id,
                 status,
                 message: None,
                 discord_invite: None,
@@ -44,14 +53,14 @@ impl Status {
             .get_result::<Status>(&*db)
     }
 
-    pub fn find_by_id(db: &DbConn, _id: Uuid) -> Result<Option<Status>, DBError> {
+    pub fn find_by_id(db: &DbConn, _user_id: Uuid) -> Result<Option<Status>, DBError> {
         use crate::database::schema::users_status::dsl::*;
-        users_status.find(_id).first::<Status>(&**db).optional()
+        users_status.filter(user_id.eq(user_id)).first::<Status>(&**db).optional()
     }
 
-    pub fn update_by_id(
+    pub fn update_by_user_id(
         db: &DbConn,
-        _id: String,
+        _user_id: String,
         status_update: String,
         message_update: String,
         discord_invite_update: String,
@@ -62,7 +71,7 @@ impl Status {
             message: &message_update,
             discord_invite: &discord_invite_update,
         };
-        diesel::update(users_status.find(uuid::Uuid::parse_str(&_id).unwrap()))
+        diesel::update(users_status.filter(user_id.eq(uuid::Uuid::parse_str(&_user_id).unwrap())))
             .set(query)
             .get_result::<Status>(&**db)
     }
