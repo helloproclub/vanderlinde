@@ -3,6 +3,7 @@ extern crate bcrypt;
 use super::response::APIResponse;
 use crate::database::DbConn;
 use crate::domain::user::*;
+use crate::domain::status::*;
 use rocket_contrib::json;
 use rocket_contrib::json::Json;
 
@@ -33,9 +34,9 @@ pub struct AuthResponse {
 }
 
 #[post("/register", data = "<form>")]
-pub fn register(db: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
+pub fn register(db_user: DbConn, db_status: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
     let result = User::new(
-        db,
+        db_user,
         UserForm {
             email: &*form.email,
             name: &*form.name,
@@ -51,6 +52,9 @@ pub fn register(db: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, 
     let new_user = result?;
     let id = format!("{}", new_user.id.to_hyphenated());
     let token = new_user.generate_token();
+    
+    Status::new(db_status, new_user.id, "Waiting for review")?;
+ 
     Ok(APIResponse::ok().data(json!(&AuthResponse {
         id,
         name: new_user.name,
