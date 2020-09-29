@@ -19,7 +19,7 @@ pub fn accepted(db: DbConn, id: String, form: Json<UpdateRequest>) -> Result<API
     
     Status::update_by_id(&db, id.to_string(), "Accepted".to_string())?;
  
-    let message = format!("{} Accepted with key {}", id, &form.secret);
+    let message = format!("{} Accepted", id);
     Ok(APIResponse::ok().message(&message))
 }
 
@@ -31,6 +31,6 @@ pub fn declined(db: DbConn, id: String, form: Json<UpdateRequest>) -> Result<API
     
     Status::update_by_id(&db, id.to_string(), "Declined".to_string())?;
  
-    let message = format!("{} Declined with key {}", id, &form.secret);
+    let message = format!("{} Declined", id);
     Ok(APIResponse::ok().message(&message))
 }

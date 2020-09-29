@@ -34,9 +34,9 @@ pub struct AuthResponse {
 }
 
 #[post("/register", data = "<form>")]
-pub fn register(db: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
+pub fn register(db_user: DbConn, db_status: DbConn, form: Json<RegisterRequest>) -> Result<APIResponse, APIResponse> {
     let result = User::new(
-        db,
+        db_user,
         UserForm {
             email: &*form.email,
             name: &*form.name,
