@@ -11,8 +11,8 @@ use uuid::Uuid;
 pub struct Status {
     pub id: Uuid,
     pub status: String,
-    pub message: String,
-    pub discord_invite: String,
+    pub message: Option<String>,
+    pub discord_invite: Option<String>,
 }
 
 #[derive(Insertable)]
@@ -20,8 +20,8 @@ pub struct Status {
 pub struct CreateStatusForm<'a> {
     pub id: uuid::Uuid,
     pub status: &'a str,
-    pub message: &'a str,
-    pub discord_invite: &'a str,
+    pub message: Option<&'a str>,
+    pub discord_invite: Option<&'a str>,
 }
 
 #[derive(AsChangeset)]
@@ -33,19 +33,13 @@ pub struct UpdateStatusForm<'a> {
 }
 
 impl Status {
-    pub fn new<'a>(
-        db: DbConn,
-        id: uuid::Uuid,
-        status: &'a str,
-    ) -> Result<Status, DBError> {
-        let message = "";
-        let discord_invite = "";
+    pub fn new<'a>(db: DbConn, id: uuid::Uuid, status: &'a str) -> Result<Status, DBError> {
         diesel::insert_into(users_status::table)
             .values(&CreateStatusForm {
                 id,
                 status,
-                message,
-                discord_invite,
+                message: None,
+                discord_invite: None,
             })
             .get_result::<Status>(&*db)
     }
@@ -63,7 +57,7 @@ impl Status {
         discord_invite_update: String,
     ) -> Result<Status, DBError> {
         use crate::database::schema::users_status::dsl::*;
-        let query = &UpdateStatusForm{
+        let query = &UpdateStatusForm {
             status: &status_update,
             message: &message_update,
             discord_invite: &discord_invite_update,

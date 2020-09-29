@@ -14,6 +14,7 @@ pub struct UserResponse {
     cv_url: String,
     letter_url: String,
     linkedin_url: String,
+    division: i32,
 }
 
 #[derive(Deserialize)]
@@ -45,6 +46,7 @@ pub fn get_by_id(userid: String, db: DbConn) -> Result<APIResponse, APIResponse>
                 cv_url: user.cv_url,
                 letter_url: user.letter_url,
                 linkedin_url: user.linkedin_url,
+                division: user.division
             }))),
         },
     }
@@ -69,6 +71,7 @@ pub fn get_me(db: DbConn, auth: crate::lib::auth::Auth) -> Result<APIResponse, A
                         cv_url: user.cv_url,
                         letter_url: user.letter_url,
                         linkedin_url: user.linkedin_url,
+                        division: user.division
                     }))),
                 },
             }
@@ -111,6 +114,7 @@ pub fn update_me(
                     cv_url: user.cv_url,
                     letter_url: user.letter_url,
                     linkedin_url: user.linkedin_url,
+                    division: user.division
                 }))),
             }
         }
