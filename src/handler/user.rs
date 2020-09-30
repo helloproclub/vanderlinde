@@ -1,5 +1,6 @@
 use super::response::APIResponse;
 use crate::database::DbConn;
+use crate::domain::status::*;
 use crate::domain::user::*;
 use rocket_contrib::json;
 use rocket_contrib::json::Json;
@@ -105,17 +106,20 @@ pub fn update_me(
             );
             match result {
                 Err(_) => Err(APIResponse::error().bad_request()),
-                Ok(user) => Ok(APIResponse::ok().data(json!(UserResponse {
-                    id: user.id.to_string(),
-                    email: user.email,
-                    nim: user.nim,
-                    name: user.name,
-                    ktm_url: user.ktm_url,
-                    cv_url: user.cv_url,
-                    letter_url: user.letter_url,
-                    linkedin_url: user.linkedin_url,
-                    division: user.division
-                }))),
+                Ok(user) => {
+                    Status::update_by_user_id(&db, userid.to_string(), 0, None, None);
+                    return Ok(APIResponse::ok().data(json!(UserResponse {
+                        id: user.id.to_string(),
+                        email: user.email,
+                        nim: user.nim,
+                        name: user.name,
+                        ktm_url: user.ktm_url,
+                        cv_url: user.cv_url,
+                        letter_url: user.letter_url,
+                        linkedin_url: user.linkedin_url,
+                        division: user.division
+                    })));
+                }
             }
         }
         None => Err(APIResponse::error().unauthorized()),
