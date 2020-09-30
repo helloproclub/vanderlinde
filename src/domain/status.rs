@@ -49,7 +49,7 @@ impl Status {
             .get_result::<Status>(&*db)
     }
 
-    pub fn find_by_id(db: &DbConn, _user_id: Uuid) -> Result<Option<Status>, DBError> {
+    pub fn find_by_userid(db: &DbConn, _user_id: Uuid) -> Result<Option<Status>, DBError> {
         use crate::database::schema::users_status::dsl::*;
         users_status
             .filter(user_id.eq(user_id))

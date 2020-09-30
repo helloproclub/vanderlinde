@@ -11,8 +11,14 @@ pub struct StatusResponse {
     id: String,
     user_id: String,
     status: i32,
-    message: String,
-    discord_invite: String,
+    message: Option<String>,
+    discord_invite: Option<String>,
+}
+
+#[derive(Serialize)]
+pub struct StatusResponseList {
+    count: i32,
+    items: Vec<StatusResponse>,
 }
 
 #[derive(Deserialize)]
@@ -45,8 +51,8 @@ pub fn accepted(
             id: data.id.to_string(),
             user_id: data.user_id.to_string(),
             status: data.status,
-            message: data.message.unwrap(),
-            discord_invite: data.discord_invite.unwrap()
+            message: data.message,
+            discord_invite: data.discord_invite
         }))),
     }
 }
@@ -69,8 +75,55 @@ pub fn declined(
             id: data.id.to_string(),
             user_id: data.user_id.to_string(),
             status: data.status,
-            message: data.message.unwrap(),
-            discord_invite: data.discord_invite.unwrap()
+            message: data.message,
+            discord_invite: data.discord_invite
         }))),
+    }
+}
+
+#[get("/?<status>")]
+pub fn get_all_status(db: DbConn, status: Option<i32>) -> Result<APIResponse, APIResponse> {
+    let result = Status::find_all_by_status(&db, status);
+    match result {
+        Err(_) => Err(APIResponse::error().bad_request()),
+        Ok(data) => match data {
+            Some(statuses) => Ok(APIResponse::ok().data(json!(&StatusResponseList {
+                count: statuses.len() as i32,
+                items: statuses
+                    .into_iter()
+                    .map(|status| StatusResponse {
+                        id: status.id.to_string(),
+                        status: status.status,
+                        user_id: status.user_id.to_string(),
+                        message: status.message,
+                        discord_invite: status.discord_invite,
+                    })
+                    .collect()
+            }))),
+            None => Err(APIResponse::error().not_found()),
+        },
+    }
+}
+
+#[get("/<userid>")]
+pub fn get_status_by_userid(db: DbConn, userid: String) -> Result<APIResponse, APIResponse> {
+    match uuid::Uuid::parse_str(&*userid) {
+        Ok(id) => {
+            let result = Status::find_by_userid(&db, id);
+            match result {
+                Err(_) => Err(APIResponse::error().bad_request()),
+                Ok(data) => match data {
+                    Some(status) => Ok(APIResponse::ok().data(json!(&StatusResponse {
+                        id: status.id.to_string(),
+                        user_id: status.user_id.to_string(),
+                        status: status.status,
+                        message: status.message,
+                        discord_invite: status.discord_invite
+                    }))),
+                    None => Err(APIResponse::error().not_found()),
+                },
+            }
+        }
+        Err(_) => Err(APIResponse::error().not_found()),
     }
 }

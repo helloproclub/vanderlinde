@@ -66,7 +66,15 @@ impl Server {
                 "/user",
                 routes![user::get_by_id, user::get_me, user::update_me],
             )
-            .mount("/status", routes![status::accepted, status::declined])
+            .mount(
+                "/status",
+                routes![
+                    status::accepted,
+                    status::declined,
+                    status::get_status_by_userid,
+                    status::get_all_status,
+                ],
+            )
         // .mount("/graphql", rocket::routes![post_graphql_handler, graphiql])
     }
 }
