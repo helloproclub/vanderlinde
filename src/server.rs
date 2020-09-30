@@ -28,7 +28,7 @@ fn make_cors() -> Cors {
 
     CorsOptions {
         allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Post]
+        allowed_methods: vec![Method::Get, Method::Post, Method::Options]
             .into_iter()
             .map(From::from)
             .collect(),
