@@ -17,7 +17,7 @@ table! {
     users_status (id) {
         id -> Uuid,
         user_id -> Uuid,
-        status -> Text,
+        status -> Int4,
         message -> Nullable<Text>,
         discord_invite -> Nullable<Text>,
     }

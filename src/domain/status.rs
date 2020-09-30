@@ -11,7 +11,7 @@ use uuid::Uuid;
 pub struct Status {
     pub id: Uuid,
     pub user_id: Uuid,
-    pub status: String,
+    pub status: i32,
     pub message: Option<String>,
     pub discord_invite: Option<String>,
 }
@@ -21,7 +21,7 @@ pub struct Status {
 pub struct CreateStatusForm<'a> {
     pub id: uuid::Uuid,
     pub user_id: uuid::Uuid,
-    pub status: &'a str,
+    pub status: i32,
     pub message: Option<&'a str>,
     pub discord_invite: Option<&'a str>,
 }
@@ -29,17 +29,13 @@ pub struct CreateStatusForm<'a> {
 #[derive(AsChangeset)]
 #[table_name = "users_status"]
 pub struct UpdateStatusForm<'a> {
-    pub status: &'a str,
+    pub status: i32,
     pub message: &'a str,
     pub discord_invite: &'a str,
 }
 
 impl Status {
-    pub fn new<'a>(
-        db: DbConn,
-        user_id: uuid::Uuid,
-        status: &'a str,
-    ) -> Result<Status, DBError> {
+    pub fn new<'a>(db: DbConn, user_id: uuid::Uuid, status: i32) -> Result<Status, DBError> {
         let _message = "";
         let _discord_invite = "";
         diesel::insert_into(users_status::table)
@@ -55,19 +51,36 @@ impl Status {
 
     pub fn find_by_id(db: &DbConn, _user_id: Uuid) -> Result<Option<Status>, DBError> {
         use crate::database::schema::users_status::dsl::*;
-        users_status.filter(user_id.eq(user_id)).first::<Status>(&**db).optional()
+        users_status
+            .filter(user_id.eq(user_id))
+            .first::<Status>(&**db)
+            .optional()
+    }
+
+    pub fn find_all_by_status(
+        db: &DbConn,
+        _status: Option<i32>,
+    ) -> Result<Option<Vec<Status>>, DBError> {
+        use crate::database::schema::users_status::dsl::*;
+        match _status {
+            None => users_status.load::<Status>(&**db).optional(),
+            Some(s) => users_status
+                .filter(status.eq(s))
+                .load::<Status>(&**db)
+                .optional(),
+        }
     }
 
     pub fn update_by_user_id(
         db: &DbConn,
         _user_id: String,
-        status_update: String,
+        status_update: i32,
         message_update: String,
         discord_invite_update: String,
     ) -> Result<Status, DBError> {
         use crate::database::schema::users_status::dsl::*;
         let query = &UpdateStatusForm {
-            status: &status_update,
+            status: status_update,
             message: &message_update,
             discord_invite: &discord_invite_update,
         };

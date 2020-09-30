@@ -59,7 +59,7 @@ pub fn register(
     let id = format!("{}", new_user.id.to_hyphenated());
     let token = new_user.generate_token();
 
-    Status::new(db_status, new_user.id, "Waiting for review")?;
+    Status::new(db_status, new_user.id, 0)?;
 
     Ok(APIResponse::ok().data(json!(&AuthResponse {
         id,

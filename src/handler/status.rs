@@ -10,7 +10,7 @@ use rocket_contrib::json::Json;
 pub struct StatusResponse {
     id: String,
     user_id: String,
-    status: String,
+    status: i32,
     message: String,
     discord_invite: String,
 }
@@ -35,7 +35,7 @@ pub fn accepted(
     let result = Status::update_by_user_id(
         &db,
         id.to_string(),
-        "Accepted".to_string(),
+        1,
         form.message.to_string(),
         form.discord_invite.to_string(),
     );
@@ -48,7 +48,7 @@ pub fn accepted(
             status: data.status,
             message: data.message.unwrap(),
             discord_invite: data.discord_invite.unwrap()
-        })))
+        }))),
     }
 }
 
@@ -65,7 +65,7 @@ pub fn declined(
     let result = Status::update_by_user_id(
         &db,
         id.to_string(),
-        "Declined".to_string(),
+        2,
         form.message.to_string(),
         form.discord_invite.to_string(),
     );
@@ -78,6 +78,6 @@ pub fn declined(
             status: data.status,
             message: data.message.unwrap(),
             discord_invite: data.discord_invite.unwrap()
-        })))
+        }))),
     }
 }
