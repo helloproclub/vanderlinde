@@ -32,8 +32,15 @@ pub struct UpdateRequest {
 
 #[get("/<userid>")]
 pub fn get_by_id(userid: String, db: DbConn) -> Result<APIResponse, APIResponse> {
-    let id: &str = &*userid;
-    let result = User::find_by_id(&db, uuid::Uuid::parse_str(id).unwrap());
+    let _id: &str = &*userid;
+    let uuidparse = uuid::Uuid::parse_str(_id);
+    if let Err(_) = uuidparse {
+        return Err(APIResponse::error().bad_request().message("Invalid id"));
+    }
+
+    let id = uuidparse.unwrap();
+
+    let result = User::find_by_id(&db, id);
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
         Ok(data) => match data {
@@ -57,8 +64,15 @@ pub fn get_by_id(userid: String, db: DbConn) -> Result<APIResponse, APIResponse>
 pub fn get_me(db: DbConn, auth: crate::lib::auth::Auth) -> Result<APIResponse, APIResponse> {
     match auth.user_id {
         Some(userid) => {
-            let id = &*userid;
-            let result = User::find_by_id(&db, uuid::Uuid::parse_str(id).unwrap());
+            let _id: &str = &*userid;
+            let uuidparse = uuid::Uuid::parse_str(_id);
+            if let Err(_) = uuidparse {
+                return Err(APIResponse::error().bad_request().message("Invalid id"));
+            }
+
+            let id = uuidparse.unwrap();
+
+            let result = User::find_by_id(&db, id);
             match result {
                 Err(_) => Err(APIResponse::error().bad_request()),
                 Ok(data) => match data {
@@ -89,10 +103,17 @@ pub fn update_me(
 ) -> Result<APIResponse, APIResponse> {
     match auth.user_id {
         Some(userid) => {
-            let id = &*userid;
+            let _id: &str = &*userid;
+            let uuidparse = uuid::Uuid::parse_str(_id);
+            if let Err(_) = uuidparse {
+                return Err(APIResponse::error().bad_request().message("Invalid id"));
+            }
+
+            let id = uuidparse.unwrap();
+
             let result = User::update_by_id(
                 &db,
-                uuid::Uuid::parse_str(id).unwrap(),
+                id,
                 UpdateUser {
                     name: &*form.name,
                     email: &*form.email,
@@ -107,7 +128,7 @@ pub fn update_me(
             match result {
                 Err(_) => Err(APIResponse::error().bad_request()),
                 Ok(user) => {
-                    Status::update_by_user_id(&db, userid.to_string(), 0, None, None);
+                    Status::update_by_user_id(&db, id, 0, None, None);
                     return Ok(APIResponse::ok().data(json!(UserResponse {
                         id: user.id.to_string(),
                         email: user.email,

@@ -73,7 +73,7 @@ impl Status {
 
     pub fn update_by_user_id(
         db: &DbConn,
-        _user_id: String,
+        _user_id: Uuid,
         _status: i32,
         _message: Option<&str>,
         _discord_invite: Option<&str>,
@@ -84,7 +84,7 @@ impl Status {
             message: _message,
             discord_invite: _discord_invite,
         };
-        diesel::update(users_status.filter(user_id.eq(uuid::Uuid::parse_str(&_user_id).unwrap())))
+        diesel::update(users_status.filter(user_id.eq(_user_id)))
             .set(query)
             .get_result::<Status>(&**db)
     }

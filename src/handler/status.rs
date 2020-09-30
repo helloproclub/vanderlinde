@@ -43,7 +43,15 @@ pub fn accepted(
         return Err(APIResponse::error().unauthorized().message("wrong secret"));
     };
 
-    let result = Status::update_by_user_id(&db, userid, 1, None, Some(&*form.discord_invite));
+    let _id: &str = &*userid;
+    let uuidparse = uuid::Uuid::parse_str(_id);
+    if let Err(_) = uuidparse {
+        return Err(APIResponse::error().bad_request().message("Invalid id"));
+    }
+
+    let id = uuidparse.unwrap();
+
+    let result = Status::update_by_user_id(&db, id, 1, None, Some(&*form.discord_invite));
 
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
@@ -67,7 +75,15 @@ pub fn declined(
         return Err(APIResponse::error().unauthorized().message("wrong secret"));
     };
 
-    let result = Status::update_by_user_id(&db, userid.to_string(), 2, Some(&*form.message), None);
+    let _id: &str = &*userid;
+    let uuidparse = uuid::Uuid::parse_str(_id);
+    if let Err(_) = uuidparse {
+        return Err(APIResponse::error().bad_request().message("Invalid id"));
+    }
+
+    let id = uuidparse.unwrap();
+
+    let result = Status::update_by_user_id(&db, id, 2, Some(&*form.message), None);
 
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
