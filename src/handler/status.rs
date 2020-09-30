@@ -16,29 +16,28 @@ pub struct StatusResponse {
 }
 
 #[derive(Deserialize)]
-pub struct UpdateRequest {
+pub struct DeclineRequest {
     message: String,
+    secret: String,
+}
+
+#[derive(Deserialize)]
+pub struct AcceptRequest {
     discord_invite: String,
     secret: String,
 }
 
-#[post("/accepted/<id>", data = "<form>")]
+#[post("/<userid>/accept", data = "<form>")]
 pub fn accepted(
     db: DbConn,
-    id: String,
-    form: Json<UpdateRequest>,
+    userid: String,
+    form: Json<AcceptRequest>,
 ) -> Result<APIResponse, APIResponse> {
     if form.secret != crate::config::secret() {
         return Err(APIResponse::error().unauthorized().message("wrong secret"));
     };
 
-    let result = Status::update_by_user_id(
-        &db,
-        id.to_string(),
-        1,
-        form.message.to_string(),
-        form.discord_invite.to_string(),
-    );
+    let result = Status::update_by_user_id(&db, userid, 1, None, Some(&*form.discord_invite));
 
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
@@ -52,23 +51,17 @@ pub fn accepted(
     }
 }
 
-#[post("/declined/<id>", data = "<form>")]
+#[post("/<userid>/decline", data = "<form>")]
 pub fn declined(
     db: DbConn,
-    id: String,
-    form: Json<UpdateRequest>,
+    userid: String,
+    form: Json<DeclineRequest>,
 ) -> Result<APIResponse, APIResponse> {
     if form.secret != crate::config::secret() {
         return Err(APIResponse::error().unauthorized().message("wrong secret"));
     };
 
-    let result = Status::update_by_user_id(
-        &db,
-        id.to_string(),
-        2,
-        form.message.to_string(),
-        form.discord_invite.to_string(),
-    );
+    let result = Status::update_by_user_id(&db, userid.to_string(), 2, Some(&*form.message), None);
 
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),

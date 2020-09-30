@@ -30,8 +30,8 @@ pub struct CreateStatusForm<'a> {
 #[table_name = "users_status"]
 pub struct UpdateStatusForm<'a> {
     pub status: i32,
-    pub message: &'a str,
-    pub discord_invite: &'a str,
+    pub message: Option<&'a str>,
+    pub discord_invite: Option<&'a str>,
 }
 
 impl Status {
@@ -74,15 +74,15 @@ impl Status {
     pub fn update_by_user_id(
         db: &DbConn,
         _user_id: String,
-        status_update: i32,
-        message_update: String,
-        discord_invite_update: String,
+        _status: i32,
+        _message: Option<&str>,
+        _discord_invite: Option<&str>,
     ) -> Result<Status, DBError> {
         use crate::database::schema::users_status::dsl::*;
         let query = &UpdateStatusForm {
-            status: status_update,
-            message: &message_update,
-            discord_invite: &discord_invite_update,
+            status: _status,
+            message: _message,
+            discord_invite: _discord_invite,
         };
         diesel::update(users_status.filter(user_id.eq(uuid::Uuid::parse_str(&_user_id).unwrap())))
             .set(query)
