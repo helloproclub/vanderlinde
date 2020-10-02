@@ -21,6 +21,7 @@ fn make_cors() -> Cors {
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "http://0.0.0.0:3000",
+        &config::frontend_whitelist(),
         &format!("http://localhost:{}", port),
         &format!("http://127.0.0.1:{}", port),
         &format!("http://0.0.0.0:{}", port),

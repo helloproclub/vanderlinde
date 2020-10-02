@@ -22,3 +22,7 @@ pub fn database_url() -> String {
 pub fn secret() -> String {
     env::var("SECRET").unwrap_or(default::secret())
 }
+
+pub fn frontend_whitelist() -> String {
+    env::var("FRONTEND_WHITELIST").unwrap_or(default::frontend_whitelist())
+}

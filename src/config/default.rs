@@ -9,3 +9,7 @@ pub fn database_url() -> String {
 pub fn secret() -> String {
     "secret".to_owned()
 }
+
+pub fn frontend_whitelist() -> String {
+    "https://teknofest.proclub.tech".to_owned()
+}
