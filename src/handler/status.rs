@@ -97,14 +97,22 @@ pub fn declined(
     }
 }
 
-#[get("/?<status>")]
-pub fn get_all_status(db: DbConn, status: Option<i32>) -> Result<APIResponse, APIResponse> {
-    let result = Status::find_all_by_status(&db, status);
+#[get("/?<status>&<limit>&<offset>")]
+pub fn get_all_status(
+    db: DbConn,
+    status: Option<i32>,
+    limit: Option<i32>,
+    offset: Option<i32>,
+) -> Result<APIResponse, APIResponse> {
+    let _limit = limit.unwrap_or(10);
+    let _offset = offset.unwrap_or(0);
+    let result = Status::find_all_by_status(&db, status, _limit, _offset);
+    let count = Status::count_by_status(&db, status);
     match result {
         Err(_) => Err(APIResponse::error().bad_request()),
         Ok(data) => match data {
             Some(statuses) => Ok(APIResponse::ok().data(json!(&StatusResponseList {
-                count: statuses.len() as i32,
+                count: count.unwrap() as i32,
                 items: statuses
                     .into_iter()
                     .map(|status| StatusResponse {

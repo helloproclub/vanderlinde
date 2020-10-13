@@ -60,14 +60,31 @@ impl Status {
     pub fn find_all_by_status(
         db: &DbConn,
         _status: Option<i32>,
+        _limit: i32,
+        _offset: i32,
     ) -> Result<Option<Vec<Status>>, DBError> {
         use crate::database::schema::users_status::dsl::*;
         match _status {
             None => users_status.load::<Status>(&**db).optional(),
             Some(s) => users_status
                 .filter(status.eq(s))
+                .limit(_limit as i64)
+                .offset(_offset as i64)
                 .load::<Status>(&**db)
                 .optional(),
+        }
+    }
+
+    pub fn count_by_status(db: &DbConn, _status: Option<i32>) -> Result<i64, DBError> {
+        use crate::database::schema::users_status::dsl::*;
+        use diesel::dsl::count;
+
+        match _status {
+            None => users_status.select(count(id)).first(&**db),
+            Some(s) => users_status
+                .select(count(id))
+                .filter(status.eq(s))
+                .first(&**db),
         }
     }
 
